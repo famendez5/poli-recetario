@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Poli Recetario - Agregar</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+	<script defer src="https://use.fontawesome.com/releases/v5.14.0/js/all.js"></script>
+</head>
+
+<body>
+	<section class="section">
+		<nav class="level container">
+			<div class="level-left">
+				<div class="level-item">
+					<h1 class="title">
+						Poli Recetario
+					</h1>
+				</div>
+			</div>
+
+			<div class="level-right">
+				<p class="level-item">
+					<button id="btnLogout" class="button is-danger">Salir</button>
+				</p>
+			</div>
+		</nav>
+	</section>
+
+	<section class="section pt-0">
+		<div class="container">
+			<form id="formulario" class="block">
+				<div class="flex-direction-row">
+					<div class="field mr-2">
+						<label class="label" for="inpNomb">Nombre</label>
+						<div class="control">
+							<input id="inpNomb" class="input" type="text" required>
+						</div>
+					</div>
+
+					<div class="field mr-2">
+						<label class="label" for="inpPorc">Porciones</label>
+						<div class="control">
+							<input id="inpPorc" class="input" type="number" required min="1">
+						</div>
+					</div>
+				</div>
+
+				<div class="field">
+					<label class="label" for="inpImag">Imagen</label>
+					<div class="file has-name is-fullwidth">
+						<label class="file-label has-label">
+							<input id="inpImag" class="file-input" type="file" accept="image/*" required>
+							<span class="file-cta">
+								<span class="file-icon">
+									<i class="fas fa-upload"></i>
+								</span>
+								<span class="file-label">
+									Seleccionar imagen
+								</span>
+							</span>
+							<span id="imgName" class="file-name is-hidden">
+							</span>
+						</label>
+					</div>
+				</div>
+
+				<div class="field">
+					<label class="label" for="inpIngr">Ingredientes</label>
+					<div class="control">
+						<textarea id="inpIngr" class="textarea " placeholder="Un ingrediente por línea"
+							required></textarea>
+					</div>
+				</div>
+
+				<div class="field">
+					<label class="label" for="inpInst">Instrucciones</label>
+					<div class="control">
+						<textarea id="inpInst" class="textarea" placeholder="Una instrucción por línea"
+							required></textarea>
+					</div>
+				</div>
+
+				<div class="field is-grouped">
+					<div class="control">
+						<button id="btnSubmit" class="button is-link">Aceptar</button>
+					</div>
+					<div class="control">
+						<button id="btnCancel" class="button is-link is-light">Cancelar</button>
+					</div>
+				</div>
+			</form>
+
+
+		</div>
+	</section>
+</body>
+
+
+<script>
+	function eliminarReceta(id) {
+		const liReceta = document.getElementById(`receta-${id}`)
+		liReceta.remove()
+	}
+
+	window.addEventListener('load', function () {
+		if (!localStorage.getItem('usuario')) {
+			location.href = 'login.html'
+			return
+		}
+
+		const btnLogout = document.getElementById('btnLogout')
+		const btnCancel = document.getElementById('btnCancel')
+
+		const formulario = document.getElementById('formulario')
+		const inpNomb = document.getElementById('inpNomb')
+		const inpPorc = document.getElementById('inpPorc')
+		const inpIngr = document.getElementById('inpIngr')
+		const inpInst = document.getElementById('inpInst')
+		const inpImag = document.getElementById('inpImag')
+		const imgName = document.getElementById('imgName')
+
+		inpImag.addEventListener('change', function (event) {
+			if (event.target.files.length !== 0) {
+				const file = event.target.files[0]
+				imgName.innerText = file.name
+				imgName.classList.remove('is-hidden')
+			}
+		})
+
+		function agregarReceta({ imagen }) {
+			const receta = {
+				id: Date.now(),
+				autor: localStorage.getItem('usuario'),
+				nombre: inpNomb.value,
+				porciones: parseInt(inpPorc.value),
+				ingredientes: inpIngr.value,
+				instrucciones: inpInst.value,
+				fecha: new Date(),
+				imagen: imagen,
+			}
+
+			const recetas = JSON.parse(localStorage.getItem('recetas') || '[]')
+			recetas.push(receta)
+			localStorage.setItem('recetas', JSON.stringify(recetas))
+		}
+
+
+		btnSubmit.addEventListener('click', function (event) {
+			if (formulario.checkValidity()) {
+				event.preventDefault()
+			} else {
+				return
+			}
+
+			const fr = new FileReader()
+			fr.readAsDataURL(inpImag.files[0])
+			fr.onload = function () {
+				agregarReceta({ imagen: fr.result })
+
+				btnSubmit.classList.add('is-loading')
+
+				setTimeout(function () {
+					location.href = 'index.html'
+				}, 300)
+			}
+
+			fr.onerror = function (error) {
+				alert(error)
+			}
+		})
+
+		btnCancel.addEventListener('click', function (event) {
+			event.preventDefault()
+			location.href = 'index.html'
+		})
+
+		btnLogout.addEventListener('click', function (event) {
+			event.preventDefault()
+
+			localStorage.removeItem('usuario')
+			localStorage.removeItem('recetas')
+
+			btnLogout.classList.add('is-loading')
+			setTimeout(function () {
+				location.href = 'login.html'
+			}, 300)
+		})
+	})
+</script>
+
+</html>

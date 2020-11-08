@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Iniciar sesión</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+</head>
+
+<body>
+	<section class="section">
+		<div class="container">
+			<h1 class="title">
+				Inicio de sesión
+			</h1>
+			<p class="subtitle">
+				Ingresa tu usuario y contraseña.
+			</p>
+
+			<form class="block">
+				<div class="field">
+					<label class="label">Usuario</label>
+					<div class="control">
+						<input id="inpUsuario" class="input" type="text" placeholder="admin">
+					</div>
+				</div>
+
+				<div class="field">
+					<label class="label">Contraseña</label>
+					<div class="control">
+						<input id="inpClave" class="input" type="password" placeholder="admin">
+					</div>
+				</div>
+
+				<div class="field is-grouped">
+					<div class="control">
+						<button id="btnSubmit" class="button is-link">Enviar</button>
+					</div>
+				</div>
+			</form>
+
+
+			<div id="notError" class="notification is-danger is-hidden">
+				<button class="delete"></button>
+				El usuario y contraseña ingresados no son validos
+			</div>
+		</div>
+	</section>
+</body>
+
+<script>
+	window.addEventListener('load', function () {
+		if (localStorage.getItem('usuario')) {
+			location.href = 'index.html'
+			return
+		}
+
+		const btnSubmit = document.getElementById('btnSubmit')
+		const inpUsuario = document.getElementById('inpUsuario')
+		const inpClave = document.getElementById('inpClave')
+		const notError = document.getElementById('notError')
+		const btnCloseError = notError.querySelector('.delete')
+
+		function validarCredenciales() {
+			return inpUsuario.value === 'admin' && inpClave.value === 'admin'
+		}
+
+		btnSubmit.addEventListener('click', function (event) {
+			event.preventDefault()
+
+			if (!validarCredenciales()) {
+				notError.classList.remove('is-hidden')
+				return
+			} else {
+				localStorage.setItem('usuario', inpUsuario.value)
+
+				notError.classList.add('is-hidden')
+			}
+
+			btnSubmit.classList.add('is-loading')
+
+			const recetas = [
+				{
+					id: 1,
+					nombre: 'Papas chorreadas',
+					imagen: 'images/1.png',
+					autor: inpUsuario.value,
+					porciones: 6,
+					ingredientes: `
+					6 papas R12 medianas. También puede hacer la receta con papa sabanera
+					3 tallos de cebolla larga
+					2 tomates maduros medianos
+					1/2 taza de leche
+					1/2 taza de agua
+					1 cucharada de margarina
+					Una pizca de achiote en polvo (color)
+					Una pizca de comino
+					1 cucharada de sal
+					`,
+					instrucciones: `
+					Para las papas. En una olla agregue medio litro de agua con media cucharada de sal y ponga a cocinar las papas hasta que estén blandas.
+					Para el guiso. En un sartén agregue la margarina y coloque a sofreír la cebolla larga hasta que esté transparente y agregue el tomate, el color, el comino y media taza de agua.
+					Revuelva y deje cocinar hasta que los tomates ablanden.
+					Después, incorpore la leche y continúe revolviendo suavemente y deje cocinar hasta que el guiso tome consistencia.
+					Deguste la preparación sazone con la sal restante, de ser necesario.
+					`,
+					fecha: new Date(),
+				},
+				{
+					id: 2,
+					nombre: 'Carne de cerdo en salsa',
+					imagen: 'images/2.jpg',
+					autor: inpUsuario.value,
+					porciones: 6,
+					ingredientes: `
+					1 libra de carne de cerdo picada en cuadros
+					2 cucharadas de aceite de cocina
+					2 cebollas cabezonas medianas finamente picadas
+					1/2 pimentón rojo finamente picado
+					1/2 calabacín amarillo picado en medias lunas
+					1 taza de repollo blanco finamente picado y/o rallado
+					1 tallo de apio picado en medias lunas
+					1 zanahoria mediana picada en cuadros
+					1 taza de raíces chinas
+					1 diente de ajo
+					6 cucharadas de salsa de soya
+					1 cucharada de vinagre blanco
+					3 cucharadas de panela rayada
+					1 cucharadita de jengibre fresco rallado
+					2 cucharadas de cilantro finamente picado
+					`,
+					instrucciones: `
+					En una sartén agregue una cucharada de aceite y saltee la carne de cerdo con el ajo.
+					En otro recipiente, caliente el aceite restante y sofría la cebolla y el pimentón. Mezcle con la carne, y adicione una parte de la salsa de soya.
+					Adicione el apio, el calabacín y el repollo a la carne de cerdo. Agregue el jengibre y la panela.
+					Deje cocinar hasta que la carne esté blanda y bien cocida.
+					Adicione el vinagre, el cilantro, las raíces chinas y la salsa de soya restante. Mezcle muy bien.
+					Deguste la preparación y adicione sal, de ser necesario.
+					`,
+					fecha: new Date(),
+				},
+				{
+					id: 3,
+					nombre: 'Pollo en salsa con verduras',
+					imagen: 'images/3.jpg',
+					autor: inpUsuario.value,
+					porciones: 6,
+					ingredientes: `
+					1 libra de lomito de pollo en cuadros
+					1 cucharada de aceite de cocina
+					1 cebolla cabezona pequeña finamente picada
+					1 zanahoria mediana picada en cuadros
+					2 tallos de apio picados en medias lunas
+					Maíz precocido
+					1 taza de champiñones en láminas
+					2 dientes de ajo
+					2 cucharadas de perejil crespo finamente picado
+					4 hojas de albahaca
+					Una pizca de sal
+					`,
+					instrucciones: `
+					En una sartén agregue el aceite y sofría el ajo, la cebolla, el apio y la zanahoria hasta que estén blandos.
+					Agregue el pollo y mezcle muy bien con el guiso. Deje cocinar tapado por 1 hora aproximadamente, hasta que el pollo esté en su punto.
+					Incorpore el maíz y los champiñones y continúe la cocción por 5 minutos más.
+					Deguste la preparación y adicione la sal e incorpore el perejil.
+					`,
+					fecha: new Date(),
+				},
+			]
+
+			localStorage.setItem('recetas', JSON.stringify(recetas))
+
+			setTimeout(function () {
+				location.href = 'index.html'
+			}, 300)
+		})
+
+		// Ocultar notificación al hacer clic en la X
+		btnCloseError.addEventListener('click', function () {
+			notError.classList.add('is-hidden')
+		})
+	})
+</script>
+
+</html>

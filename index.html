@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Poli Recetario</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+	<script defer src="https://use.fontawesome.com/releases/v5.14.0/js/all.js"></script>
+</head>
+
+<body>
+	<section class="section">
+		<nav class="level container">
+			<div class="level-left">
+				<div class="level-item">
+					<h1 class="title">
+						Poli Recetario
+					</h1>
+				</div>
+			</div>
+
+			<div class="level-right">
+				<p class="level-item">
+					<button id="btnAdd" class="button is-success">Nueva receta</button>
+				</p>
+				<p class="level-item">
+					<button id="btnLogout" class="button is-danger">Salir</button>
+				</p>
+			</div>
+		</nav>
+	</section>
+
+	<section class="section">
+		<div class="container">
+			<ul id="lstRecetas">
+			</ul>
+		</div>
+	</section>
+</body>
+
+<script>
+	let recetas = JSON.parse(localStorage.getItem('recetas') || '[]')
+
+	function eliminarReceta(id) {
+		const liReceta = document.getElementById(`receta-${id}`)
+		liReceta.remove()
+
+		recetas = recetas.filter(receta => receta.id !== id)
+		localStorage.setItem('recetas', JSON.stringify(recetas))
+	}
+
+	function toggleRecetaModal(id) {
+		const modal = document.getElementById(`receta-modal-${id}`)
+		modal.classList.toggle('is-active')
+	}
+
+	window.addEventListener('load', function () {
+		if (!localStorage.getItem('usuario')) {
+			location.href = 'login.html'
+			return
+		}
+
+		const btnLogout = document.getElementById('btnLogout')
+		const btnAdd = document.getElementById('btnAdd')
+		const lstRecetas = document.getElementById('lstRecetas')
+
+
+		recetas.forEach(agregarReceta)
+
+
+		function agregarReceta({ id, nombre, imagen, porciones, ingredientes, instrucciones, autor, fecha }) {
+			const imageSrc = imagen !== undefined ? imagen : 'https://bulma.io/images/placeholders/128x128.png'
+
+			const ingredientesItems = (ingredientes || '').trim().split('\n').map((ingrediente) => `
+				<li>
+					${ingrediente}
+				</li>
+			`).join('\n')
+
+			const instruccionesItems = (instrucciones || '').trim().split('\n').map((instruccion) => `
+				<li>${instruccion}</li>
+			`).join('\n')
+
+			const innerHTML = `
+				<li id="receta-${id}" class="block">
+					<article class="media" onhover="toggleRecetaModal(${id})">
+						<figure class="media-left">
+							<p class="image is-128x128">
+								<img src="${imageSrc}">
+							</p>
+						</figure>
+						<div class="media-content">
+							<div class="content">
+								<p>
+									<strong>${nombre}</strong>
+									<br>
+									Porciones: ${porciones}
+									<br>
+									Por <small>@${autor}</small> 
+								</p>
+							</div>
+							<button class="button is-info is-light" onclick="toggleRecetaModal(${id})">Leer</button>
+						</div>
+						<div class="media-right">
+							<button class="delete" title="Eliminar receta" onclick="eliminarReceta(${id})"></button>
+						</div>
+					</article>
+					
+					<div id="receta-modal-${id}" class="modal">
+						<div class="modal-background"></div>
+						<div class="modal-card">
+							<header class="modal-card-head">
+								<p class="modal-card-title">
+									${nombre}
+								</p>
+								<button class="delete" aria-label="close" onclick="toggleRecetaModal(${id})"></button>
+							</header>
+							<section class="modal-card-body">
+								<div class="block">
+									<h2 class="title is-size-4">Ingredientes</h2>
+									<ul style="list-style: disc" class="ml-3">
+										${ingredientesItems}
+									</ul>
+								</div>
+								<div class="block">
+									<h2 class="title is-size-4">Instrucciones</h2>
+									<ol class="ml-3 mb-3">
+										${instruccionesItems}
+									</ol>
+								</div>
+							</section>
+							<footer class="modal-card-foot">
+								<button class="button is-link" onclick="toggleRecetaModal(${id})">Aceptar</button>
+							</footer>
+						</div>
+					</div>
+				</li>
+			`
+
+			lstRecetas.innerHTML += innerHTML
+		}
+
+		btnLogout.addEventListener('click', function (event) {
+			event.preventDefault()
+
+			localStorage.removeItem('usuario')
+			localStorage.removeItem('recetas')
+
+			btnLogout.classList.add('is-loading')
+			setTimeout(function () {
+				location.href = 'login.html'
+			}, 300)
+		})
+
+		btnAdd.addEventListener('click', function (event) {
+			event.preventDefault()
+			location.href = 'add.html'
+		})
+	})
+</script>
+
+</html>
